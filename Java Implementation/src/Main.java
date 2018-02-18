@@ -54,6 +54,8 @@ public class Main {
                 firstName = new String(tempFirstName);
 
                 firstName = firstName.replaceAll("\n", ""); //remove new line
+                
+                firstName = firstName.replaceAll("\0", "");
 
                 //check if name is valid with regex -> https://regexr.com/3kqol
                 if(!(Pattern.matches("^((?!.*[\\/\\^\\$\\#\\@\\!\\*\\;\\<\\>\\&\\\\]).{1,50})$", firstName))) {
@@ -75,6 +77,9 @@ public class Main {
                 lastName = new String(tempLastName);
                 
                 lastName = lastName.replaceAll("\n", ""); //remove new line
+                
+                lastName = lastName.replaceAll("\0", "");
+                
                 //check if name is valid with regex -> https://regexr.com/3kqol
                 if(!(Pattern.matches("^((?!.*[\\/\\^\\$\\#\\@\\!\\*\\;\\<\\>\\&\\\\]).{1,50})$", lastName))) {
                     throw new InvalidDataException("Invalid input");
@@ -84,9 +89,9 @@ public class Main {
                 System.out.println("Input not accepted: Try again!");
             }
         }
-
-        System.out.println("First name: " + firstName);
-        System.out.println("Last name: " + lastName);
+        
+        System.out.println("First name: " + firstName + ". Length: " + firstName.length());
+        System.out.println("Last name: " + lastName + ". Length: " + firstName.length());
     }
 
 }
