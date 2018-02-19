@@ -1,4 +1,6 @@
 import java.io.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.regex.Pattern;
 import java.util.Scanner;
 
@@ -36,24 +38,23 @@ public class Main {
     public static void main(String[] args) {
         File inputFile = null;
         File outputFile = null;
-        BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
         Scanner kin = new Scanner(System.in);
-        System.out.println(System.getProperty("user.dir")+"\\Main.java");
-        /*
+
 
          //----------------------------------------------------------------Actual method calls------------------------------
+         String firstName = getFirstName(kin);
+         String lastName = getLastName(kin);
 
-         String firstName = getFirstName(buf);
-         String lastName = getLastName(buf);
-
-         int int1 = getIntValue(buf);
-         int int2 = getIntValue(buf);
+         int int1 = getIntValue(kin);
+         int int2 = getIntValue(kin);
 
          inputFile = new File(getInFile(kin));
          outputFile = new File(getOutFile(kin, inputFile));
 
-         //----------------------------------------------------------------System prints for tests--------------------------
+         doPassword(kin);
 
+         //----------------------------------------------------------------System prints for tests--------------------------
+        /*
          System.out.println("First name: " + firstName);
          System.out.println("Last name: " + lastName);
 
@@ -62,76 +63,66 @@ public class Main {
 
          System.out.println(inputFile.getAbsolutePath());
          System.out.println(outputFile.getAbsolutePath());
-         */
+        */
 
         //------------------------write to file---------------------
-        inputFile = new File("C:\\Users\\Doomcrown\\Desktop\\Secure project\\src\\tester.txt");
-        outputFile = new File("C:\\Users\\Doomcrown\\Desktop\\Secure project\\src\\tester2.txt");
-        writeToFile("Jordan","Caraway", 10,20, inputFile, outputFile);
-
-
+        writeToFile(firstName, lastName, int1, int2, inputFile, outputFile);
 
     }
 
-    private static String getFirstName(BufferedReader buf) {
+    private static String getFirstName(Scanner kin) {
         String firstName;
-        char[] tempFirstName = {};
+        System.out.println("\nName Rules: Must start with a letter, followed by only letters and the symbols ' and -\ncan not have -- '' '- or -' anywhere in your name.\n");
         while (true) {
             try {
-                tempFirstName = new char[51];
                 System.out.print("Enter first name (up to 50 chars): ");
-                buf.read(tempFirstName, 0, 50);
-                firstName = new String(tempFirstName);
-
-                firstName = firstName.replaceAll("\n", ""); //remove new line
-
-                //check if name is valid with regex -> https://regexr.com/3kqol
-                if (!(Pattern.matches("^((?!.*[\\/\\^\\$\\#\\@\\!\\*\\;\\<\\>\\&\\\\]).{1,50})$", firstName))) {
-                    throw new Exception("Invalid input");
+                firstName = kin.nextLine();
+                if(Pattern.matches("^[a-zA-Z]{1}[a-zA-Z\\-\\']{0,49}$",firstName))
+                {
+                    if (Pattern.matches("^.*([\\-\\']{2}).*$", firstName)) {
+                        throw new Exception("Name is not valid");
+                    }
                 }
+                else{throw new Exception("Name is not valid");}
                 break;
             } catch (Exception e) {
-                System.out.println("Input not accepted: Try again!");
+                System.out.println(e.getMessage());
             }
         }
         return firstName;
     }
 
-    private static String getLastName(BufferedReader buf) {
+    private static String getLastName(Scanner kin) {
         String lastName;
-        char[] tempLastName = {};
+        System.out.println("\nName Rules: Must start with a letter, followed by only letters and the symbols ' and -\ncan not have -- '' '- or -' anywhere in your name.\n");
         while (true) {
             try {
-                tempLastName = new char[51];
                 System.out.print("Enter last name (up to 50 chars): ");
-                buf.read(tempLastName, 0, 50);
-                lastName = new String(tempLastName);
-
-                lastName = lastName.replaceAll("\n", ""); //remove new line
-                //check if name is valid with regex -> https://regexr.com/3kqol
-                if (!(Pattern.matches("^((?!.*[\\/\\^\\$\\#\\@\\!\\*\\;\\<\\>\\&\\\\]).{1,50})$", lastName))) {
-                    throw new Exception("Invalid input");
+                lastName = kin.nextLine();
+                if(Pattern.matches("^[a-zA-Z]{1}[a-zA-Z\\-\\']{0,49}$",lastName))
+                {
+                    if (Pattern.matches("^.*([\\-\\']{2}).*$", lastName))
+                    {
+                        throw new Exception("Name is not valid");
+                    }
                 }
+                else{throw new Exception("Name is not valid");}
                 break;
             } catch (Exception e) {
-                System.out.println("Input not accepted: Try again!");
+                System.out.println(e.getMessage());
             }
         }
         return lastName;
     }
 
-    private static int getIntValue(BufferedReader buf) {
+    private static int getIntValue(Scanner kin) {
         String s = "";
-        char[] tempInput = {};
         int val;
+        System.out.println("\nInt Rules: must contain only numbers with an optional prefix -\nnumber must be between -2147483648 to 2147483647 to be classified as an int.\n");
         while (true) {
             try {
-                tempInput = new char[13];
-                System.out.print("Enter an int value (Between -2147483647 to 2147483647): ");
-                buf.read(tempInput, 0, 13);
-                s = new String(tempInput);
-                s = s.replaceAll("\\s", ""); //Strips out all whitespace characters like newline and space
-                s = s.replaceAll("\u0000", ""); //Strips out null characters produced by the buffered reader
+                System.out.print("Enter an int value: ");
+                s = kin.nextLine();
 
                 if (!isInt(s)) {
                     throw new Exception("Invalid input");
@@ -160,14 +151,66 @@ public class Main {
         return true;
     }
 
+    private static void doPassword(Scanner kin)
+    {
+        String pass = "";
+        String hash = "";
+        String hash2 = "";
+        byte[] bytes;
+        BigInteger bInt;
+        System.out.println("\nPassword must be between 8 and 32 characters\nPassword can only contain numbers, letters, and ~!@#$%&*<>?: ");
+        while (true)
+        {
+            try{
+                System.out.print("Enter a password: ");
+                pass = kin.nextLine();
+                if (!Pattern.matches("^[a-zA-Z0-9\\~\\!\\@\\#\\$\\%\\?\\<\\>\\&\\*]{8,32}$", pass))
+                {
+                    throw new Exception("Password is not valid.");
+                }
+
+                MessageDigest m = MessageDigest.getInstance("MD5");
+                m.reset();
+                m.update(pass.getBytes());
+                bytes = m.digest();
+                bInt = new BigInteger(1,bytes);
+
+                hash = bInt.toString(16); //password stored as hash
+
+                System.out.print("Re-enter password: ");
+                pass = kin.nextLine();
+
+                m.reset();
+                m.update(pass.getBytes());
+                bytes = m.digest();
+                bInt = new BigInteger(1,bytes);
+
+                hash2 = bInt.toString(16);
+
+                if(!hash.equals(hash2))
+                {
+                    throw new Exception("Passwords do not match. Try again.");
+                }
+
+                System.out.println("Passwords matched!");
+                break;
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     private static String getInFile(Scanner kin)
     {
         String s = "";
+        System.out.println("\nFile rules: Requires absolute file path\n" +
+                "File must exist in the working directory or a subdirectory\n" +
+                "File must be of type .java, .c, or .txt\n" +
+                "This programs source file can not be the target\n");
         while (true) {
             try {
 
-                System.out.println("Enter a valid absolute file path for INPUT(Must exist in the working directory or a subdirectory)");
-                System.out.print("-File must be a java, c, or text file: ");
+                System.out.print("Enter a valid absolute file path for INPUT: ");
 
                 s = kin.nextLine();
 
@@ -207,14 +250,19 @@ public class Main {
     private static String getOutFile(Scanner kin, File inFile)
     {
         String s = "";
+        System.out.println("\nFile rules: Requires absolute file path\n" +
+                "File must exist in the working directory or a subdirectory\n" +
+                "File must be of type .java, .c, or .txt\n" +
+                "This programs source file can not be the target\n" +
+                "Output file can not be the same as input file\n" +
+                "File must already exist\n");
         while (true) {
             try {
 
-                System.out.println("Enter a valid absolute file path for OUTPUT(Must exist in the working directory or a subdirectory)");
-                System.out.print("-File must be a java, c, or text file: ");
+                System.out.print("Enter a valid absolute file path for OUTPUT");
 
                 s = kin.nextLine();
-                System.out.println(s);
+
 
                 if(!s.contains(System.getProperty("user.dir"))) //Checks to make sure file is at least in the working directory first
                 {
