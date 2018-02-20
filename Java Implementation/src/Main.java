@@ -37,14 +37,12 @@ public class Main {
     public static void main(String[] args) {
         File inputFile = null;
         File outputFile = null;
-        Scanner kin = new Scanner(System.in);
+        BufferedReader kin = new BufferedReader(new InputStreamReader(System.in));
 
         // ----------------------------------------------------------------Actual method
         // calls------------------------------
-        String firstName = getNameInput(kin,
-                "\nFirst Name Rules: Must start with a letter, followed by only letters and the symbols ' and -\ncan not have -- '' '- or -' anywhere in your first name.\n");
-        String lastName = getNameInput(kin,
-                "\nLast Name Rules: Must start with a letter, followed by only letters and the symbols ' and -\ncan not have -- '' '- or -' anywhere in your last name.\n");
+        String firstName = getNameInput(kin, "Enter first name (up to 50 chars): ");
+        String lastName = getNameInput(kin, "Enter last name (up to 50 chars): ");
 
         int int1 = getIntValue(kin);
         int int2 = getIntValue(kin);
@@ -71,16 +69,26 @@ public class Main {
          */
 
         // ------------------------write to file---------------------
+
+        System.out.println("\nWriting to file.");
+
         writeToFile(firstName, lastName, castedInt1, castedInt2, inputFile, outputFile);
+        
+        try {
+            kin.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static String getNameInput(Scanner kin, String userPrompt) {
+    private static String getNameInput(BufferedReader kin, String userPrompt) {
         String temp;
-        System.out.println(userPrompt);
+        System.out.println(
+                "\nLast Name Rules: Must start with a letter, followed by only letters and the symbols ' and -\\ncan not have -- '' '- or -' anywhere in your last name.\n");
         while (true) {
             try {
-                System.out.print("Enter last name (up to 50 chars): ");
-                temp = kin.nextLine();
+                System.out.print(userPrompt);
+                temp = kin.readLine();
                 if (Pattern.matches("^[a-zA-Z]{1}[a-zA-Z\\-\\']{0,49}$", temp)) {
                     if (Pattern.matches("^.*([\\-\\']{2}).*$", temp)) {
                         throw new Exception("Name is not valid");
@@ -96,7 +104,7 @@ public class Main {
         return temp;
     }
 
-    private static int getIntValue(Scanner kin) {
+    private static int getIntValue(BufferedReader kin) {
         String s = "";
         int val;
         System.out.println(
@@ -104,7 +112,7 @@ public class Main {
         while (true) {
             try {
                 System.out.print("Enter an int value: ");
-                s = kin.nextLine();
+                s = kin.readLine();
 
                 if (!isInt(s)) {
                     throw new Exception("Invalid input");
@@ -123,7 +131,7 @@ public class Main {
         if (s.equals(null) || s.isEmpty()) {
             return false;
         }
-       
+
         try {
             Integer.parseInt(s);
         } catch (Exception e) {
@@ -133,7 +141,7 @@ public class Main {
         return true;
     }
 
-    private static void doPassword(Scanner kin) {
+    private static void doPassword(BufferedReader kin) {
         String pass = "";
         String hash = "";
         String hash2 = "";
@@ -144,7 +152,7 @@ public class Main {
         while (true) {
             try {
                 System.out.print("Enter a password: ");
-                pass = kin.nextLine();
+                pass = kin.readLine();
                 if (!Pattern.matches("^[a-zA-Z0-9\\~\\!\\@\\#\\$\\%\\?\\<\\>\\&\\*]{8,32}$", pass)) {
                     throw new Exception("Password is not valid.");
                 }
@@ -158,7 +166,7 @@ public class Main {
                 hash = bInt.toString(16); // password stored as hash
 
                 System.out.print("Re-enter password: ");
-                pass = kin.nextLine();
+                pass = kin.readLine();
 
                 m.reset();
                 m.update(pass.getBytes());
@@ -198,7 +206,7 @@ public class Main {
         }
     }
 
-    private static String getInFile(Scanner kin) {
+    private static String getInFile(BufferedReader kin) {
         String s = "";
         System.out.println("\nFile rules: Requires absolute file path\n"
                 + "File must exist in the working directory or a subdirectory\n"
@@ -209,7 +217,7 @@ public class Main {
 
                 System.out.print("Enter a valid absolute file path for INPUT: ");
 
-                s = kin.nextLine();
+                s = kin.readLine();
 
                 if (!s.contains(System.getProperty("user.dir"))) // Checks to make sure file is at least in the working
                                                                  // directory first
@@ -233,14 +241,16 @@ public class Main {
                     throw new Exception("File must be of type .txt, .java. or .c");
                 }
 
-                if (s.contains(System.getProperty("user.dir") + File.separator + "Main.java")) // checks to make sure the file is not
-                                                                                // the java source
+                if (s.contains(System.getProperty("user.dir") + File.separator + "Main.java")) // checks to make sure
+                                                                                               // the file is not
+                // the java source
                 {
                     throw new Exception("File can not be this application source.");
                 }
 
-                if (s.contains(System.getProperty("user.dir") + File.separator + "passwordHash.txt")) // checks to make sure the file
-                                                                                       // is not the passwordHash file
+                if (s.contains(System.getProperty("user.dir") + File.separator + "passwordHash.txt")) // checks to make
+                                                                                                      // sure the file
+                // is not the passwordHash file
                 {
                     throw new Exception("File can not be the passwordHash file.");
                 }
@@ -253,19 +263,34 @@ public class Main {
         return s;
     }
 
-    private static String getOutFile(Scanner kin, File inFile) {
+    private static String getOutFile(BufferedReader kin, File inFile) {
         String s = "";
         System.out.println("\nFile rules: Requires absolute file path\n"
                 + "File must exist in the working directory or a subdirectory\n"
                 + "File must be of type .java, .c, or .txt\n" + "File can not be the passwordHash.txt file\n"
                 + "This programs source file can not be the target\n"
-                + "Output file can not be the same as input file\n" + "File must already exist\n");
+                + "Output file can not be the same as input file\n" + "File must already exist\n"
+                + "\n --NOTE-- The file will be overwritten! --NOTE--\n");
         while (true) {
             try {
 
-                System.out.print("Enter a valid absolute file path for OUTPUT");
+                System.out.print("Enter a valid absolute file path for OUTPUT: ");
 
-                s = kin.nextLine();
+                s = kin.readLine();
+
+                if (s.contains(System.getProperty("user.dir") + File.separator + "passwordHash.txt")) // checks to make
+                // sure the file
+                // is not the passwordHash file
+                {
+                    throw new Exception("File can not be the passwordHash file.");
+                }
+
+                if (s.contains(inFile.getAbsolutePath())) // checks to make sure outfile is not the same as input file
+                {
+                    throw new Exception("Output file can not be the same as input file.");
+                }
+
+                File outputFile = new File(s);
 
                 if (!s.contains(System.getProperty("user.dir"))) // Checks to make sure file is at least in the working
                                                                  // directory first
@@ -273,12 +298,12 @@ public class Main {
                     throw new Exception("This path does not exist in the working directory.");
                 }
 
-                if (!new File(s).getAbsoluteFile().exists()) // Checks if file actually exists
+                if (!(outputFile.exists())) // Checks if file actually exists
                 {
                     throw new FileNotFoundException("File does not exist.");
                 }
 
-                if (new File(s).isDirectory()) // checks if file is actually a directory
+                if (outputFile.isDirectory()) // checks if file is actually a directory
                 {
                     throw new FileNotFoundException("Directories are not valid files.");
                 }
@@ -289,21 +314,11 @@ public class Main {
                     throw new Exception("File must be of type .txt, .java. or .c");
                 }
 
-                if (s.contains(System.getProperty("user.dir") + File.separator + "Main.java")) // checks to make sure the file is not
-                                                                                // the java source
+                if (s.contains(System.getProperty("user.dir") + File.separator + "Main.java")) // checks to make sure
+                                                                                               // the file is not
+                // the java source
                 {
                     throw new Exception("File can not be this application source.");
-                }
-
-                if (s.contains(System.getProperty("user.dir") + File.separator + "passwordHash.txt")) // checks to make sure the file
-                                                                                       // is not the passwordHash file
-                {
-                    throw new Exception("File can not be the passwordHash file.");
-                }
-
-                if (s.contains(inFile.getAbsolutePath())) // checks to make sure outfile is not the same as input file
-                {
-                    throw new Exception("Output file can not be the same as input file.");
                 }
 
                 break;
@@ -319,7 +334,7 @@ public class Main {
         PrintWriter pwOut = null;
         BufferedReader brIn = null;
         try {
-            FileWriter fwOut = new FileWriter(outFile, true);
+            FileWriter fwOut = new FileWriter(outFile, false);
             pwOut = new PrintWriter(fwOut);
             // Prints data for name and ints
             pwOut.println("\n<<<<<<<<<<<<Start of File Writing>>>>>>>>>>>>");
