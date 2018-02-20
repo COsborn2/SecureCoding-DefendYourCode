@@ -1,8 +1,12 @@
 import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.regex.Pattern;
-import java.util.Scanner;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 /**
  * @author Cameron Osborn
@@ -142,11 +146,10 @@ public class Main {
     }
 
     private static void doPassword(BufferedReader kin) {
+        String saltString = "";
         String pass = "";
         String hash = "";
         String hash2 = "";
-        byte[] bytes;
-        BigInteger bInt;
         System.out.println(
                 "\nPassword must be between 8 and 32 characters\nPassword can only contain numbers, letters, and ~!@#$%&*<>?: ");
         while (true) {
@@ -156,31 +159,35 @@ public class Main {
                 if (!Pattern.matches("^[a-zA-Z0-9\\~\\!\\@\\#\\$\\%\\?\\<\\>\\&\\*]{8,32}$", pass)) {
                     throw new Exception("Password is not valid.");
                 }
-
-                MessageDigest m = MessageDigest.getInstance("MD5");
-                m.reset();
-                m.update(pass.getBytes());
-                bytes = m.digest();
-                bInt = new BigInteger(1, bytes);
-
-                hash = bInt.toString(16); // password stored as hash
-
+                
+                char[] passInChar = pass.toCharArray();
+                byte[] saltInBytes = createSalt(32).getBytes();
+                saltString = new String(saltInBytes);
+                
+                PBEKeySpec spec = new PBEKeySpec(passInChar, saltInBytes, 1000, 192);
+                
+                SecretKeyFactory key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+                
+                hash = new String(key.generateSecret(spec).getEncoded());
+                
                 System.out.print("Re-enter password: ");
                 pass = kin.readLine();
-
-                m.reset();
-                m.update(pass.getBytes());
-                bytes = m.digest();
-                bInt = new BigInteger(1, bytes);
-
-                hash2 = bInt.toString(16);
-
-                if (!hash.equals(hash2)) {
-                    throw new Exception("Passwords do not match. Try again.");
+                
+                passInChar = pass.toCharArray();
+                
+                PBEKeySpec spec2 = new PBEKeySpec(passInChar, saltInBytes, 1000, 192);
+                
+                SecretKeyFactory key2 = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+                
+                hash2 = new String(key2.generateSecret(spec2).getEncoded());
+                
+                if(!(hash.equals(hash2))) {
+                    throw new Exception("Passwords do not match!");
                 }
-
-                System.out.println("Passwords matched!");
-                writeHash(hash);
+                
+                System.out.println("Passwords match!");
+                
+                writeHash(saltString, hash);
                 break;
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -188,7 +195,7 @@ public class Main {
         }
     }
 
-    private static void writeHash(String hash) {
+    private static void writeHash(String salt, String hash) {
         File file = new File(System.getProperty("user.dir") + File.separator + "passwordHash.txt");
         PrintWriter pwOut = null;
         try {
@@ -198,7 +205,7 @@ public class Main {
             FileWriter fwOut = new FileWriter(file, true);
             pwOut = new PrintWriter(fwOut);
 
-            pwOut.println(hash + "\n");
+            pwOut.println(salt + "\n" + hash);
             pwOut.close();
             fwOut.close();
         } catch (Exception e) {
@@ -370,5 +377,14 @@ public class Main {
             }
         }
         return false;
+    }
+    
+    private static String createSalt(int length) throws NoSuchAlgorithmException {
+        SecureRandom rand = SecureRandom.getInstanceStrong();
+        byte[] saltArr = new byte[length-1];
+        
+        rand.nextBytes(saltArr);
+        
+        return new String(saltArr);
     }
 }// end class
