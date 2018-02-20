@@ -193,10 +193,32 @@ public class Main {
                 }
 
                 System.out.println("Passwords matched!");
+                writeHash(hash);
                 break;
             } catch(Exception e) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    private static void writeHash(String hash)
+    {
+        File file = new File(System.getProperty("user.dir")+"\\passwordHash.txt");
+        PrintWriter pwOut = null;
+        try {
+            if(!file.exists())
+            {
+                file.createNewFile();
+            }
+            FileWriter fwOut = new FileWriter(file, true);
+            pwOut = new PrintWriter(fwOut);
+
+            pwOut.println(hash+ "\n");
+            pwOut.close();
+            fwOut.close();
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -206,7 +228,8 @@ public class Main {
         System.out.println("\nFile rules: Requires absolute file path\n" +
                 "File must exist in the working directory or a subdirectory\n" +
                 "File must be of type .java, .c, or .txt\n" +
-                "This programs source file can not be the target\n");
+                "This programs source file can not be the target\n" +
+                "File can not be the passwordHash.txt file\n");
         while (true) {
             try {
 
@@ -239,6 +262,11 @@ public class Main {
                     throw new Exception("File can not be this application source.");
                 }
 
+                if(s.contains(System.getProperty("user.dir")+"\\passwordHash.txt")) //checks to make sure the file is not the passwordHash file
+                {
+                    throw new Exception("File can not be the passwordHash file.");
+                }
+
                 break;
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -253,6 +281,7 @@ public class Main {
         System.out.println("\nFile rules: Requires absolute file path\n" +
                 "File must exist in the working directory or a subdirectory\n" +
                 "File must be of type .java, .c, or .txt\n" +
+                "File can not be the passwordHash.txt file\n" +
                 "This programs source file can not be the target\n" +
                 "Output file can not be the same as input file\n" +
                 "File must already exist\n");
@@ -287,6 +316,11 @@ public class Main {
                 if(s.contains(System.getProperty("user.dir")+"\\Main.java")) //checks to make sure the file is not the java source
                 {
                     throw new Exception("File can not be this application source.");
+                }
+
+                if(s.contains(System.getProperty("user.dir")+"\\passwordHash.txt")) //checks to make sure the file is not the passwordHash file
+                {
+                    throw new Exception("File can not be the passwordHash file.");
                 }
 
                 if(s.contains(inFile.getAbsolutePath())) //checks to make sure outfile is not the same as input file
