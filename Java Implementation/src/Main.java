@@ -296,6 +296,7 @@ public class Main {
                 }
 
                 File outputFile = new File(s);
+                outputFile.createNewFile();
 
                 if (!s.contains(System.getProperty("user.dir"))) // Checks to make sure file is at least in the working
                                                                  // directory first

@@ -1,10 +1,39 @@
 
-<<<<<<<<<<<<Start of File Writing>>>>>>>>>>>>
-Steve
-lastname
-45
-506
+Last Name Rules: Must start with a letter, followed by only letters and the symbols ' and -\ncan not have -- '' '- or -' anywhere in your last name.
 
-test
-<<<<<<<<<<<<<End of File Writing>>>>>>>>>>>>>
+Enter first name (up to 50 chars): 
+Last Name Rules: Must start with a letter, followed by only letters and the symbols ' and -\ncan not have -- '' '- or -' anywhere in your last name.
 
+Enter last name (up to 50 chars): 
+Int Rules: must contain only numbers with an optional prefix -
+number must be between -2147483648 to 2147483647 to be classified as an int.
+
+Enter an int value: 
+Int Rules: must contain only numbers with an optional prefix -
+number must be between -2147483648 to 2147483647 to be classified as an int.
+
+Enter an int value: 
+File rules: Requires absolute file path
+File must exist in the working directory or a subdirectory
+File must be of type .java, .c, or .txt
+This programs source file can not be the target
+File can not be the passwordHash.txt file
+
+Enter a valid absolute file path for INPUT: 
+File rules: Requires absolute file path
+File must exist in the working directory or a subdirectory
+File must be of type .java, .c, or .txt
+File can not be the passwordHash.txt file
+This programs source file can not be the target
+Output file can not be the same as input file
+File must already exist
+
+ --NOTE-- The file will be overwritten! --NOTE--
+
+Enter a valid absolute file path for OUTPUT: 
+Password must be between 8 and 32 characters
+Password can only contain numbers, letters, and ~!@#$%&*<>?: 
+Enter a password: Re-enter password: Passwords do not match!
+Enter a password: Re-enter password: Passwords match!
+
+Writing to file.
